@@ -39,9 +39,10 @@ public:
     
     VariableOversampling<> oversample;
     float mFreq{in0(0)};
-    float mDepth;
-    float mSpread;
-    float mReduction;
+    float mPhase{in0(1)};
+    float mDepth{in0(2)};
+    float mSpread{in0(3)};
+    float mReduction{in0(4)};
     float mLerp{in0(5)};
     float* buf;
     float* buf_; // copy to keep past version of the buffer
@@ -64,8 +65,6 @@ private:
 
     float *osBuffer;
     int mOversamplingIndex;
-
-    float mPhase; // phase of the oscillator, from 0 to 1.
     double mFreqMul; // a constant for multiplying frequency
 };
 

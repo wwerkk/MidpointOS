@@ -70,7 +70,7 @@ float MidpointOSNext::next(float freq, float phaseIn, float freqMul, float depth
 MidpointOS::MidpointOS() {
   const float SR = sampleRate();
     oversample.reset(SR);
-    mOversamplingIndex = sc_clip(int(in0(5)), 0, 4);
+    mOversamplingIndex = sc_clip(int(in0(6)), 0, 4);
     oversample.setOversamplingIndex(mOversamplingIndex);
     osBuffer = oversample.getOSBuffer();
     mCalcFunc = make_calc_function<MidpointOS, &MidpointOS::next_aa>();
@@ -139,29 +139,27 @@ void MidpointOS::clear(int inNumSamples) {
 void MidpointOS::next_aa(int nSamples) {
   // get the pointer to the output buffer
     float *outBuf = out(0);
-    const float *freq = in(0);
-    const float *depth = in(1);
-    const float *spread = in(2);
-    const float *reduction = in(3);
-    const float *lerp = in(4);
+    const float *freq = in(0);;
+    const float *phase = in(1);
+    const float *depth = in(2);
+    const float *spread = in(3);
+    const float *reduction = in(4);
+    const float *lerp = in(5);
     double freqmul = mFreqMul;
-    float phase = mPhase;
 
     for (int i=0; i < nSamples; ++i) {
       float out = 0.f;
       for (int k = 0; k < oversample.getOversamplingRatio(); k++) {
         mFreq = freq[(inRate(0) != calc_ScalarRate) * i];
-        mDepth = depth[(inRate(1) != calc_ScalarRate) * i];
-        mLerp = lerp[(inRate(4) != calc_ScalarRate) * i];
-        osBuffer[k] = midpoint.next(mFreq, 0., mFreqMul / oversample.getOversamplingRatio(), mDepth, mLerp, buf, buf_, mSize, mSize_);
+        mPhase = phase[(inRate(1) != calc_ScalarRate) * i];
+        mDepth = depth[(inRate(2) != calc_ScalarRate) * i];
+        mLerp = lerp[(inRate(5) != calc_ScalarRate) * i];
+        osBuffer[k] = midpoint.next(mFreq, mPhase, mFreqMul / oversample.getOversamplingRatio(), mDepth, mLerp, buf, buf_, mSize, mSize_);
       }
       if (mOversamplingIndex != 0) out = oversample.downsample();
       else out = osBuffer[0];
       outBuf[i] = out;
     }
-
-
-    mPhase = phase;
 }
 
 void MidpointOS::subdiv(float* b, float* b_, int size, float spread) {
