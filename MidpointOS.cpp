@@ -14,7 +14,7 @@ MidpointOSNext::MidpointOSNext() {
 
 MidpointOSNext::~MidpointOSNext() {}
 
-float MidpointOSNext::next(float freq, float phaseIn, float freqMul, float depth, float lerp, float* buf, float* buf_, int mSize, int mSize_) {
+float MidpointOSNext::next(float freq, float phaseIn, float freqMul, float depth, float spread, float reduction, float lerp, float* buf, float* buf_, int mSize, int mSize_) {
     float phaseDiff = (phaseIn - lastPhase);
     lastPhase = phaseIn;
 
@@ -36,30 +36,30 @@ float MidpointOSNext::next(float freq, float phaseIn, float freqMul, float depth
   // phase += freq * freqMul;
   if (phase >= 1.f) {
     phase -= 1.f;
-      parent->buf[0] = 0;
-      parent->buf[1] = 1;
-      parent->buf[2] = 0;
-      parent->buf[3] = -1;
-      // parent->buf[4] = 0;
-      parent->mSize = 4;
-      // parent->mSize_ = 5;
-      // Copy(parent->mSize, parent->buf_, buf);
-      for (int i = 0; i < ceilf(parent->mDepth); ++i) {
-        parent->subdiv(parent->buf, parent->buf_, parent->mSize, parent->mSpread * powf(parent->mReduction, i));
+      buf[0] = 0;
+      buf[1] = 1;
+      buf[2] = 0;
+      buf[3] = -1;
+      // buf[4] = 0;
+      mSize = 4;
+      // mSize_ = 5;
+      // Copy(mSize, buf_, buf);
+      for (int i = 0; i < ceilf(depth); ++i) {
+        parent->subdiv(buf, buf_, mSize, spread * powf(reduction, i));
       }
   }
   else if (phase <= 0.f) {
     phase += 1.f;
-    parent->buf[0] = 0;
-    parent->buf[1] = 1;
-    parent->buf[2] = 0;
-    parent->buf[3] = -1;
-    // parent->buf[4] = 0;
-    parent->mSize = 4;
-    // parent->mSize_ = 5;
-    // Copy(parent->mSize, parent->buf_, buf);
-    for (int i = 0; i < ceilf(parent->mDepth); ++i) {
-      parent->subdiv(parent->buf, parent->buf_, parent->mSize, parent->mSpread * powf(parent->mReduction, i));
+    buf[0] = 0;
+    buf[1] = 1;
+    buf[2] = 0;
+    buf[3] = -1;
+    // buf[4] = 0;
+    mSize = 4;
+    // mSize_ = 5;
+    // Copy(mSize, buf_, buf);
+    for (int i = 0; i < ceilf(depth); ++i) {
+      parent->subdiv(buf, buf_, mSize, spread * powf(reduction, i));
     }
   }
 
@@ -153,8 +153,10 @@ void MidpointOS::next_aa(int nSamples) {
         mFreq = freq[(inRate(0) != calc_ScalarRate) * i];
         mPhase = phase[(inRate(1) != calc_ScalarRate) * i];
         mDepth = depth[(inRate(2) != calc_ScalarRate) * i];
+        mSpread = spread[(inRate(3) != calc_ScalarRate) * i];
+        mReduction = reduction[(inRate(4) != calc_ScalarRate) * i];
         mLerp = lerp[(inRate(5) != calc_ScalarRate) * i];
-        osBuffer[k] = midpoint.next(mFreq, mPhase, mFreqMul / oversample.getOversamplingRatio(), mDepth, mLerp, buf, buf_, mSize, mSize_);
+        osBuffer[k] = midpoint.next(mFreq, mPhase, mFreqMul / oversample.getOversamplingRatio(), mDepth, mSpread, mReduction, mLerp, buf, buf_, mSize, mSize_);
       }
       if (mOversamplingIndex != 0) out = oversample.downsample();
       else out = osBuffer[0];
