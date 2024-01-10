@@ -1,0 +1,26 @@
+class:: MidpointOS
+summary:: Midpoint displacement algorithm implementation, oversampled version
+related:: TODO
+categories:: UGens>TODO
+
+description::
+
+Midpoint displacement algorithm implementation, oversampled version based on Sam Pluta's OversampledOscillators repository.
+
+
+classmethods::
+
+method::ar, kr
+
+argument::TODO
+
+argument::TODO
+
+
+examples::
+
+code::
+
+{ MidpointOS.ar(/* TODO */) }.play
+
+::
