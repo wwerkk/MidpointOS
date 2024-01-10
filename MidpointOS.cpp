@@ -78,7 +78,7 @@ MidpointOS::MidpointOS() {
   // mFreqMul = 2.0f/(float)sampleRate();
   mFreqMul = sampleDur();
   // get depth param
-  mDepth = in0(1);
+  mDepth = sc_clip(in0(1), 0, 24);
   // get spread param
   mSpread = in0(2);
   // get reduction param
@@ -152,7 +152,7 @@ void MidpointOS::next_aa(int nSamples) {
     for (int k = 0; k < oversample.getOversamplingRatio(); ++k) {
       mFreq = freq[(inRate(0) != calc_ScalarRate) * i];
       mPhase = phase[(inRate(1) != calc_ScalarRate) * i];
-      mDepth = depth[(inRate(2) != calc_ScalarRate) * i];
+      mDepth = sc_clip(depth[(inRate(2) != calc_ScalarRate) * i], 0, 24);
       mSpread = spread[(inRate(3) != calc_ScalarRate) * i];
       mReduction = reduction[(inRate(4) != calc_ScalarRate) * i];
       mLerp = lerp[(inRate(5) != calc_ScalarRate) * i];
