@@ -15,7 +15,7 @@ class MidpointOSNext {
   public:
     MidpointOSNext();
     ~MidpointOSNext();
-    float next(float freq, float phaseIn, float freqMul, float depth, float spread, float reduction, float lerp, float* buf, float* buf_, int mSize, int mSize_);
+    float next(float freq, float phaseIn, float freqMul, float depth, float spread, float reduction, float lerp, float* buf, float* buf_, int* mSize, int* mSize_);
     float phase{0.f};
 
     float* buf;
