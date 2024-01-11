@@ -18,19 +18,13 @@ float MidpointOSNext::next(float freq, float phaseIn, float freqMul, float depth
   float phaseDiff = (phaseIn - lastPhase);
   lastPhase = phaseIn;
 
-  int ix = int(phase * *mSize);
-  float z = buf[ix];
-  int ix_ = int(phase * *mSize_);
-  float z_ = buf_[ix_];
+  phase += (phaseDiff);
+  phase += freq * freqMul;
 
-  if (lerp) {
-    float frac = sc_frac(phase * *mSize);
-    float frac_ = sc_frac(phase * *mSize_);
-    // yo dawg
-    z = lininterp(lerp, z, lininterp(frac, buf[ix], buf[(ix + 1 ) % *mSize]));
-    z_ = lininterp(lerp, z_, lininterp(frac_, buf_[ix_], buf_[(ix_ + 1 ) % *mSize_]));
+  float phase_abs = sc_abs(phase);
+  while(phase_abs >= 2.f || phase_abs <= -1.f) {
+      phase -= 1.f * sc_sign(phase);
   }
-  // phase += freq * freqMul;
   if (phase >= 1.f) {
     phase -= 1.f;
     buf[0] = 0;
@@ -45,7 +39,8 @@ float MidpointOSNext::next(float freq, float phaseIn, float freqMul, float depth
       parent->subdiv(buf, buf_, *mSize, spread * powf(reduction, i));
     }
   }
-  else if (phase <= 0.f) {
+
+  if (phase <= 0.f) {
     phase += 1.f;
     buf[0] = 0;
     buf[1] = 1;
@@ -59,9 +54,19 @@ float MidpointOSNext::next(float freq, float phaseIn, float freqMul, float depth
       parent->subdiv(buf, buf_, *mSize, spread * powf(reduction, i));
     }
   }
+  
+  int ix = int(phase * *mSize);
+  float z = buf[ix];
+  int ix_ = int(phase * *mSize_);
+  float z_ = buf_[ix_];
 
-  phase += (phaseDiff);
-  phase += freq * freqMul;
+  if (lerp) {
+    float frac = sc_frac(phase * *mSize);
+    float frac_ = sc_frac(phase * *mSize_);
+    // yo dawg
+    z = lininterp(lerp, z, lininterp(frac, buf[ix], buf[(ix + 1 ) % *mSize]));
+    z_ = lininterp(lerp, z_, lininterp(frac_, buf_[ix_], buf_[(ix_ + 1 ) % *mSize_]));
+  }
 
   float out = lininterp(sc_frac(depth), z_, z);
   return out;
