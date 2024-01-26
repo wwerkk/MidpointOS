@@ -21,7 +21,7 @@ float MidpointOSNext::next(float freq, float phaseIn, float freqMul, float depth
   phase += (phaseDiff);
   phase += freq * freqMul;
 
-  phase = sc_wrap(phase, -1.f, 2.f)
+  phase = sc_wrap(phase, -1.f, 2.f);
   if (phase >= 1.f) {
     phase -= 1.f;
     buf[0] = 0;
